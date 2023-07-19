@@ -29,20 +29,6 @@ const List: React.FC<navigate> = ({navigation}) => {
   });
 
   const Card = ({item}: {item: Item}) => {
-    const image =
-      item.hero_name === 'Spiderman'
-        ? require('../../assets/images/spiderman.png')
-        : item.hero_name === 'Batman'
-        ? require('../../assets/images/batman.jpeg')
-        : item.hero_name === 'Superman'
-        ? require('../../assets/images/superman.jpg')
-        : item.hero_name === 'Thor'
-        ? require('../../assets/images/thor.jpg')
-        : item.hero_name === 'Ironman'
-        ? require('../../assets/images/iron.jpg')
-        : item.hero_name === 'Hulk'
-        ? require('../../assets/images/hulk.jpg')
-        : require('../../assets/images/marvel.jpg');
     return (
       <Pressable
         onPress={() => {
