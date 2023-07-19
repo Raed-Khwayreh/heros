@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
 import {QueryClientProvider, QueryClient} from 'react-query';
 import Navigation from './src/components/Navigation';
