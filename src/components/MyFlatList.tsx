@@ -21,20 +21,14 @@ const MyFlatList: React.FC<navigate> = ({navigation}) => {
       `https://6453582ce9ac46cedf22c25e.mockapi.io/heros/${id}`,
     );
   };
-  const addData = (id: string) => {
-    return axios.post(`https://6453582ce9ac46cedf22c25e.mockapi.io/heros`, {});
-  };
+
   const deleteMutation = useMutation(deleteData, {
     onSuccess: () => {
       queryClient.invalidateQueries('heros');
     },
   });
-  const addMutation = useMutation(addData, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('heros');
-    },
-  });
-  const {data} = useQuery('heros', fetchData);
+
+  const {data, isError, error} = useQuery('heros', fetchData);
   const result: Item[] = data?.data;
 
   const Card = ({item}: {item: Item}) => {
@@ -66,7 +60,8 @@ const MyFlatList: React.FC<navigate> = ({navigation}) => {
           </View>
           <Pressable
             onPress={() => {
-              console.log('delete');
+              deleteMutation.mutate(item.id);
+              
             }}>
             <View style={styles.delete}>
               <Text style={{color: 'white'}}>Delete</Text>
@@ -76,7 +71,11 @@ const MyFlatList: React.FC<navigate> = ({navigation}) => {
       </Pressable>
     );
   };
-  return (
+  return isError ? (
+    <View style={styles.errorMessage}>
+      <Text style={{color: 'red', fontSize: 20}}>{`Error 404\n${error}`}</Text>
+    </View>
+  ) : (
     <FlatList<Item>
       scrollEnabled
       data={result}
@@ -86,6 +85,11 @@ const MyFlatList: React.FC<navigate> = ({navigation}) => {
   );
 };
 const styles = StyleSheet.create({
+  errorMessage: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   card: {
     alignItems: 'center',
     justifyContent: 'space-between',
