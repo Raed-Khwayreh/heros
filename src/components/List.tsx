@@ -1,43 +1,55 @@
-import {View, Pressable, StyleSheet, FlatList, Text} from 'react-native';
-import axios from 'axios';
+import {
+  View,
+  Pressable,
+  StyleSheet,
+  Text,
+  ScrollView,
+  Image,
+} from 'react-native';
 import {QueryClient, useMutation, useQuery} from 'react-query';
+import HeroImage from './HeroImage';
+import {fetchData, deleteData} from '../api/api';
 type Item = {
   id: string;
   hero_name: string;
   hero_power: string;
-  image: string;
+  group: string;
 };
 interface navigate {
   navigation: any;
 }
 const queryClient = new QueryClient();
-const MyFlatList: React.FC<navigate> = ({navigation}) => {
-  const fetchData = () => {
-    return axios.get('https://6453582ce9ac46cedf22c25e.mockapi.io/heros');
-  };
-
-  const deleteData = (id: string) => {
-    return axios.delete(
-      `https://6453582ce9ac46cedf22c25e.mockapi.io/heros/${id}`,
-    );
-  };
+const List: React.FC<navigate> = ({navigation}) => {
+  const {data, isError, error} = useQuery<Item[]>('hero', fetchData);
 
   const deleteMutation = useMutation(deleteData, {
     onSuccess: () => {
-      queryClient.invalidateQueries('heros');
+      queryClient.invalidateQueries('hero');
     },
   });
 
-  const {data, isError, error} = useQuery('heros', fetchData);
-  const result: Item[] = data?.data;
-
   const Card = ({item}: {item: Item}) => {
+    const image =
+      item.hero_name === 'Spiderman'
+        ? require('../../assets/images/spiderman.png')
+        : item.hero_name === 'Batman'
+        ? require('../../assets/images/batman.jpeg')
+        : item.hero_name === 'Superman'
+        ? require('../../assets/images/superman.jpg')
+        : item.hero_name === 'Thor'
+        ? require('../../assets/images/thor.jpg')
+        : item.hero_name === 'Ironman'
+        ? require('../../assets/images/iron.jpg')
+        : item.hero_name === 'Hulk'
+        ? require('../../assets/images/hulk.jpg')
+        : require('../../assets/images/marvel.jpg');
     return (
       <Pressable
         onPress={() => {
           navigation.navigate('DetailScreen', {item: item});
         }}>
         <View style={styles.card}>
+          <HeroImage image={item.hero_name}></HeroImage>
           <View
             style={{
               marginLeft: 15,
@@ -60,10 +72,17 @@ const MyFlatList: React.FC<navigate> = ({navigation}) => {
           </View>
           <Pressable
             onPress={() => {
-              deleteMutation.mutate(item.id);
-              
+              navigation.navigate('EditScreen', {item: item});
             }}>
-            <View style={styles.delete}>
+            <View style={[styles.delete, styles.btn]}>
+              <Text style={{color: 'white'}}>Edit</Text>
+            </View>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              deleteMutation.mutate(item.id);
+            }}>
+            <View style={[styles.edit, styles.btn]}>
               <Text style={{color: 'white'}}>Delete</Text>
             </View>
           </Pressable>
@@ -76,12 +95,11 @@ const MyFlatList: React.FC<navigate> = ({navigation}) => {
       <Text style={{color: 'red', fontSize: 20}}>{`Error 404\n${error}`}</Text>
     </View>
   ) : (
-    <FlatList<Item>
-      scrollEnabled
-      data={result}
-      renderItem={Card}
-      keyExtractor={item => item.id}
-    />
+    <ScrollView>
+      {data?.map(el => {
+        return <Card item={el} key={el.id}></Card>;
+      })}
+    </ScrollView>
   );
 };
 const styles = StyleSheet.create({
@@ -101,10 +119,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   delete: {
+    backgroundColor: '#1C68A5',
+  },
+  edit: {
     backgroundColor: 'red',
+  },
+  btn: {
     justifyContent: 'center',
-    padding: 5,
+    padding: 7,
+    marginLeft: 5,
     borderRadius: 15,
   },
 });
-export default MyFlatList;
+export default List;

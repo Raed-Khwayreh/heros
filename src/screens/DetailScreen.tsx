@@ -1,7 +1,6 @@
 import {View, Text, StyleSheet, Image} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 type RootStackParamList = {
-  HomeScreen: any;
   DetailScreen: {
     item: {
       id: string;
@@ -14,9 +13,14 @@ type RootStackParamList = {
 type screenProp = {
   route: RouteProp<RootStackParamList, 'DetailScreen'>;
 };
-const DetailsScreen: React.FC<screenProp> = ({route}) => {
+const DetailScreen: React.FC<screenProp> = ({route}) => {
   const object = route.params.item;
-
+  const image =
+    route.params.item.group === 'marvel'
+      ? require('../../assets/images/marvel.jpg')
+      : route.params.item.group === 'marvel'
+      ? require('../../assets/images/spiderman.png')
+      : require('../../assets/images/aveng.jpg');
   return (
     <View style={styles.card}>
       <Image
@@ -25,7 +29,7 @@ const DetailsScreen: React.FC<screenProp> = ({route}) => {
           width: '100%',
           height: 200,
         }}
-        source={require('../../assets/images/marvel.jpg')}></Image>
+        source={image}></Image>
 
       <View
         style={{
@@ -55,4 +59,4 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 });
-export default DetailsScreen;
+export default DetailScreen;

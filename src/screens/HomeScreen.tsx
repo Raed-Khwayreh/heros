@@ -10,26 +10,18 @@ import {useState} from 'react';
 interface navigate {
   navigation: any;
 }
-import axios from 'axios';
 import {QueryClient, useMutation} from 'react-query';
-import MyFlatList from '../components/MyFlatList';
+import MyFlatList from '../components/List';
+import {addData} from '../api/api';
 const queryClient = new QueryClient();
+
 const HomeScreen: React.FC<navigate> = ({navigation}) => {
   const [heroName, setHeroName] = useState('');
   const [heroPower, setHeroPower] = useState('');
-  const addData = (item: object) => {
-    return axios.post(
-      `https://6453582ce9ac46cedf22c25e.mockapi.io/heros`,
-      item,
-    );
-  };
+
   const addMutation = useMutation(addData, {
     onSuccess: () => {
-      queryClient.setQueryData('heros', {
-        hero_name: 'hero',
-        hero_power: 'hero',
-      });
-      queryClient.invalidateQueries('heros');
+      queryClient.invalidateQueries('hero');
     },
   });
   return (
@@ -42,6 +34,7 @@ const HomeScreen: React.FC<navigate> = ({navigation}) => {
           <TextInput
             placeholder="Hero Name"
             style={styles.input}
+            value={heroName}
             onChangeText={text => {
               setHeroName(text);
             }}
@@ -49,19 +42,22 @@ const HomeScreen: React.FC<navigate> = ({navigation}) => {
           <TextInput
             placeholder="Hero Power"
             style={styles.input}
+            value={heroPower}
             onChangeText={text => {
               setHeroPower(text);
             }}
           />
           <Pressable
             onPress={() => {
-              const task = {
+              const hero = {
                 id: Math.random(),
                 hero_name: heroName,
                 hero_power: heroPower,
-                group: '',
+                group: 'marvel',
               };
-              addMutation.mutate(task);
+              addMutation.mutate(hero);
+              setHeroName('');
+              setHeroPower('');
             }}>
             <View style={styles.btn}>
               <Text
@@ -70,7 +66,7 @@ const HomeScreen: React.FC<navigate> = ({navigation}) => {
                   fontSize: 16,
                   fontWeight: 'bold',
                 }}>
-                Add task
+                Add Hero
               </Text>
             </View>
           </Pressable>
